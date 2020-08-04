@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         if(!keyWordDetected){
-            if(matches.get(0).matches("^\\[[ivmcldx]+\\])")){
+            if(matches.get(0).matches("^\\[[ivmcldx]+\\]")){
                 enterText(matches.get(1));
             }
             else {
