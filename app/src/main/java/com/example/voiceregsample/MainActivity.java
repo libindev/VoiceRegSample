@@ -14,6 +14,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -49,10 +50,10 @@ public class MainActivity extends AppCompatActivity
 
         recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE,
-                "en");
+                "en-US");
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
     }
 
 
@@ -138,18 +139,43 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResults(Bundle results) {
         Log.i(LOG_TAG, "onResults");
-        ArrayList<String> matches = results
-                .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-        for (String s: matches){
-            if(s.contains("left")){
-                changeFocus(false);
-                break;
+        ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+       // ArrayList<String> values  = results.getStringArrayList(SpeechRecognizer.CONFIDENCE_SCORES);
 
-            }else if(s.contains("right")){
-                changeFocus(true);
+        boolean keyWordDetected=false;
+        for (String s: matches){
+            if(s.contains("capture")){
+                for(String st:matches){
+                    keyWordDetected=true;
+                    if(s.contains("left")){
+                        changeFocus(false);
+                        break;
+                    }
+                    else if(s.contains("right")){
+                        keyWordDetected=true;
+                        changeFocus(true);
+                        break;
+                    }
+
+                }
                 break;
             }
+
+
         }
+
+        if(!keyWordDetected){
+            if(matches.get(0).matches("^\\[[ivmcldx]+\\])")){
+                enterText(matches.get(1));
+            }
+            else {
+                enterText(matches.get(0));
+            }
+
+
+
+        }
+
 
 
 
@@ -234,6 +260,17 @@ public class MainActivity extends AppCompatActivity
 
 
         v.findViewById(R.id.editText).requestFocus();
+    }
+
+
+    private void enterText(String s) {
+        View v=null;
+
+        v = gridview.getChildAt( GridAdapter.currentPosition);
+
+
+            EditText e =(v.findViewById(R.id.editText));
+            e.setText(s);
     }
 
 
